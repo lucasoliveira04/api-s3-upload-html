@@ -8,9 +8,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 public class S3UploadHtmlServiceImpl implements S3Service{
+
+
 
     private final S3Client s3Client;
 
@@ -27,6 +30,8 @@ public class S3UploadHtmlServiceImpl implements S3Service{
                 .bucket(bucketName)
                 .key(key)
                 .build();
+
+        System.out.printf(putObjectRequest.key());
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
     }
