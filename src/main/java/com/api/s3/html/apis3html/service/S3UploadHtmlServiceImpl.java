@@ -5,15 +5,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 public class S3UploadHtmlServiceImpl implements S3Service{
-
-
 
     private final S3Client s3Client;
 
@@ -31,8 +29,14 @@ public class S3UploadHtmlServiceImpl implements S3Service{
                 .key(key)
                 .build();
 
-        System.out.printf(putObjectRequest.key());
-
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+    }
+
+    @Override
+    public ListObjectsV2Request listAllFiles() {
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+        return listObjectsV2Request;
     }
 }
