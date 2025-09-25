@@ -38,10 +38,30 @@ public class HtmlController {
     public ResponseEntity<String> uploadFile(
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-            UUID uuidFile = UUID.randomUUID();
-            String fileName = "user" + count + "/" + uuidFile + "-" + file.getOriginalFilename();
+            ListObjectsV2Request request = s3Service.listAllFiles();
+            ListObjectsV2Response response = s3Client.listObjectsV2(request);
+
+            int lastUser = response.contents().stream()
+                    .map(S3Object::key)
+                    .filter(key -> key.startsWith("user"))
+                    .map(key -> {
+                        try {
+                            String numberObject = key.split("/")[0].replace("user", "");
+                            return Integer.parseInt(numberObject);
+                        } catch (Exception e) {
+                            return 0;
+                        }
+                    })
+                    .max(Integer::compareTo)
+                    .orElse(0);
+
+            int nextUser = lastUser + 1;
+
+            UUID uuid = UUID.randomUUID();
+            String fileName = "user" + nextUser + "/" + uuid + "-" + file.getOriginalFilename();
+
             s3Service.uploadFile(file, fileName);
-            count++;
-            return ResponseEntity.ok("Arquivo enviado com sucesso: " + fileName);
+
+            return ResponseEntity.ok(fileName);
     }
 }
